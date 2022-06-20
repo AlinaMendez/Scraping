@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 import sqlite3
+import matplotlib as plt
 
 url = "https://www.macrotrends.net/stocks/charts/TSLA/tesla/revenue"
 html_data = requests.get(url).text
@@ -27,3 +28,22 @@ for row in tables[my_index].tbody.find_all('tr'):
 
 df = df[df['Revenue'] != ""] # elimino los datos nulos
 print(df)
+print(type(df))
+
+df['Date'] = pd.to_datetime(df['Date'])   
+plt(df['Date'],df['Revenue'])
+plt.show()
+
+records = df.to_records(index=False)
+result = list(records)
+#print(result)
+
+connection = sqlite3.connect('Tesla.db')
+cursor = connection.cursor()
+#cursor.execute('''CREATE TABLE revenue
+#             (Date, Revenue)''')
+
+#cursor.executemany('INSERT INTO revenue VALUES (?,?)', result)
+connection.commit()
+for x in cursor.execute('SELECT * FROM revenue'):
+    print(x)
